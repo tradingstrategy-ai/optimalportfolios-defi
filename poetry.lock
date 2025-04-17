@@ -1477,9 +1477,8 @@ description = "Simulation and backtesting of optimal portfolios"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
-files = [
-    {file = "optimalportfolios-3.3.2.tar.gz", hash = "sha256:2b7ed809b1b895ae395ded122153cf8f897a0aa05ffd66555b8e2e45d362639c"},
-]
+files = []
+develop = true
 
 [package.dependencies]
 cvxpy = ">=1.3.2"
@@ -1496,6 +1495,10 @@ scipy = ">=1.12.0"
 seaborn = ">=0.13.2"
 setuptools = ">=69.1.1"
 yfinance = ">=0.2.37"
+
+[package.source]
+type = "directory"
+url = "deps/OptimalPortfolios"
 
 [[package]]
 name = "osqp"
@@ -2721,4 +2724,4 @@ repair = ["scipy (>=1.6.3)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "fd7f6cf243b52692e79b4d85c5065bfbee5c240ca83bc1bdc744c7fe65f320a9"
+content-hash = "0181809cdfa3c4ec9a4fbf1638a3be893a3df8e1e48c9e26f619ee9fa18599c7"
