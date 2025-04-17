@@ -1,0 +1,3 @@
+[submodule "deps/OptimalPortfolios"]
+	path = deps/OptimalPortfolios
+	url = git@github.com:ArturSepp/OptimalPortfolios.git
