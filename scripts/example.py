@@ -50,6 +50,7 @@ def fetch_universe_data() -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series]:
 
 # 2. get universe data
 prices, benchmark_prices, group_data = fetch_universe_data()
+import ipdb ; ipdb.set_trace()
 time_period = qis.TimePeriod('31Dec2004', '16Aug2024')   # period for computing weights backtest
 
 # 3.a. define optimisation setup

@@ -19,3 +19,4 @@ ipdb = "^0.13.13"
 
 [tool.poetry.dependencies]
 optimalportfolios = {develop = true, path = "./deps/OptimalPortfolios"}
+ecos = "^2.0.14"
