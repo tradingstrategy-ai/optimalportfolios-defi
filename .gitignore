@@ -64,3 +64,5 @@ scripts/lagoon/*.env
 
 # No idea what's this
 sample_dataset
+
+output/*
