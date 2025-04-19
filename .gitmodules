@@ -1,3 +1,6 @@
 [submodule "deps/OptimalPortfolios"]
 	path = deps/OptimalPortfolios
 	url = git@github.com:ArturSepp/OptimalPortfolios.git
+[submodule "deps/QuantInvestStrats"]
+	path = deps/QuantInvestStrats
+	url = git@github.com:ArturSepp/QuantInvestStrats.git

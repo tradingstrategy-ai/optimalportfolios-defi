@@ -1505,7 +1505,7 @@ et-xmlfile = "*"
 
 [[package]]
 name = "optimalportfolios"
-version = "3.3.2"
+version = "3.3.3"
 description = "Simulation and backtesting of optimal portfolios"
 optional = false
 python-versions = ">=3.8"
@@ -1582,14 +1582,14 @@ mkl = ["osqp-mkl"]
 
 [[package]]
 name = "packaging"
-version = "24.2"
+version = "25.0"
 description = "Core utilities for Python packages"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "packaging-24.2-py3-none-any.whl", hash = "sha256:09abb1bccd265c01f4a3aa3f7a7db064b36514d2cba19a2f694fe6150451a759"},
-    {file = "packaging-24.2.tar.gz", hash = "sha256:c228a6dc5e932d346bc5739379109d49e8853dd8223571c7c5b55260edc0b97f"},
+    {file = "packaging-25.0-py3-none-any.whl", hash = "sha256:29572ef2b1f17581046b3a2227d5c611fb25ec70ca1ba8554b24b0e69331a484"},
+    {file = "packaging-25.0.tar.gz", hash = "sha256:d443872c98d677bf60f6a1f2f8c1cb748e8fe762d2bf9d3148b5599295b0fc4f"},
 ]
 
 [[package]]
@@ -2131,9 +2131,8 @@ description = "Implementation of visualisation and reporting analytics for Quant
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
-files = [
-    {file = "qis-3.2.10.tar.gz", hash = "sha256:e16f26e45abbc05375394215c6b1e81a90455e82a1b490a4d19ad848eca885b4"},
-]
+files = []
+develop = true
 
 [package.dependencies]
 easydev = ">=0.12.0"
@@ -2152,6 +2151,10 @@ SQLAlchemy = ">=1.4.46"
 statsmodels = ">=0.13.5"
 tabulate = ">=0.9.0"
 yfinance = ">=0.1.38"
+
+[package.source]
+type = "directory"
+url = "deps/QuantInvestStrats"
 
 [[package]]
 name = "quadprog"
@@ -2406,14 +2409,14 @@ stats = ["scipy (>=1.7)", "statsmodels (>=0.12)"]
 
 [[package]]
 name = "setuptools"
-version = "78.1.0"
+version = "78.1.1"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "setuptools-78.1.0-py3-none-any.whl", hash = "sha256:3e386e96793c8702ae83d17b853fb93d3e09ef82ec62722e61da5cd22376dcd8"},
-    {file = "setuptools-78.1.0.tar.gz", hash = "sha256:18fd474d4a82a5f83dac888df697af65afa82dec7323d09c3e37d1f14288da54"},
+    {file = "setuptools-78.1.1-py3-none-any.whl", hash = "sha256:c3a9c4211ff4c309edb8b8c4f1cbfa7ae324c4ba9f91ff254e3d305b9fd54561"},
+    {file = "setuptools-78.1.1.tar.gz", hash = "sha256:fcc17fd9cd898242f6b4adfaca46137a9edef687f43e6f78469692a5e70d851d"},
 ]
 
 [package.extras]
@@ -2757,4 +2760,4 @@ repair = ["scipy (>=1.6.3)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "5a94633b82539ffc8487852bb9725da0d84b950537bc272a4ba7b5430148109f"
+content-hash = "815cdf6e672e0d8e154401d986bf0c52060cb7c16b7a6fc48dfd706c226a5302"
