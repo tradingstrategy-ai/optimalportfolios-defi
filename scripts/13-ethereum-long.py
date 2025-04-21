@@ -1,12 +1,15 @@
 """REbalancing DeFi tokens.
 
-- Change rebalancing freq to weekly, year length
+- Enable short
+- Fix rebalancing freq
 
 """
 import os
 import pickle
+import webbrowser
 from dataclasses import dataclass, astuple
 from pathlib import Path
+from pprint import pformat
 
 import numpy as np
 import pandas as pd
@@ -16,13 +19,17 @@ import qis as qis
 
 from optimalportfolios import compute_rolling_optimal_weights, PortfolioObjective, Constraints
 
+
 #: Where to store the results figures and such
 OUTPUT_PATH = Path("./output")
 
-DATASET_PATH = Path("~/exported/ethereum-1d.parquet")
+DATASET_PATH = Path("~/exported/ethereum-1d-legacy.parquet")
 
 #: Name of this backtest
 NAME = Path(__file__).stem
+
+
+ASSETS_INCLUDED = {"WBTC", "WETH", "AAVE", "MKR", "UNI", "LINK", "PAXG"}
 
 
 @dataclass
@@ -56,8 +63,6 @@ def filter_oldest_pair(df):
     result = df.merge(oldest_pairs, on=['base', 'quote'])
     result = result[result['pair_id'] == result['oldest_pair_id']]
 
-    import ipdb ; ipdb.set_trace()
-
     # Drop the temporary column
     result = result.drop('oldest_pair_id', axis=1)
 
@@ -80,7 +85,8 @@ def convert_to_asset_price_series(
         df = df.loc[df["base"].isin(asset_whitelist)]
 
     # Resolve USDC/USDT quote token competition
-    df = df[~(df["quote"] == "USDT")]
+    excluded_stablecoins = {"USDT", "DAI"}
+    df = df[~(df["quote"].isin(excluded_stablecoins))]
 
     oldest_pairs_df = filter_oldest_pair(df)
 
@@ -120,7 +126,7 @@ def main():
     df = pd.read_parquet(DATASET_PATH)
     portfolio_run_input = convert_to_asset_price_series(
         df,
-        asset_whitelist={"WBTC", "WETH", "AAVE"},
+        asset_whitelist=ASSETS_INCLUDED,
         benchmark_assets={"WBTC"},
     )
     prices, benchmark_prices, group_data = astuple(portfolio_run_input)
@@ -137,13 +143,16 @@ def main():
 
     # See get_period_days() for options here.
     # Not the same as in Pandas.
-    returns_freq = 'W-MON'  # use weekly returns
+    returns_freq = 'D'  # use daily returns
     rebalancing_freq = 'W-MON'  # rebalancing weekly
-    span = 30  # span of number of returns_freq-returns for covariance estimation = 12y
+    span = 120  # span of number of returns_freq-returns for covariance estimation = 12y
+    roll_window = 20  # Look 30 days reutrns
     constraints0 = Constraints(
         is_long_only=True,
         min_weights=pd.Series(0.0, index=prices.columns),
         max_weights=pd.Series(0.5, index=prices.columns),
+        max_exposure=1.0,
+        min_exposure=0.5,
     )
 
     # 3.b. compute solvers portfolio weights rebalanced every quarter
@@ -155,6 +164,7 @@ def main():
         rebalancing_freq=rebalancing_freq,
         returns_freq=returns_freq,
         span=span,
+        roll_window=roll_window,
     )
 
     # 4. given portfolio weights, construct the performance of the portfolio
@@ -169,31 +179,42 @@ def main():
         funding_rate=funding_rate,
         weight_implementation_lag=weight_implementation_lag,
         rebalancing_costs=rebalancing_costs,
+        rebalancing_freq=rebalancing_freq,
     )
 
     # 5. using portfolio_data run the reporting with strategy factsheet
     # for group-based reporting set_group_data
     print("Generating reports")
     portfolio_data.set_group_data(group_data=group_data, group_order=list(group_data.unique()))
+
+    default_report_args = qis.fetch_default_report_kwargs(time_period=time_period)
+    print(f"Using default report args:\n{pformat(default_report_args)}")
+
     # set time period for portfolio reporting
     figs = qis.generate_strategy_factsheet(portfolio_data=portfolio_data,
                                            benchmark_prices=benchmark_prices,
                                            time_period=time_period,
-                                           **qis.fetch_default_report_kwargs(time_period=time_period))
+                                           **default_report_args)
 
 
     if not OUTPUT_PATH.exists():
         os.makedirs(OUTPUT_PATH, exist_ok=True)
 
     # save report to pdf and png
-    qis.save_figs_to_pdf(figs=figs,
+    pdf_path = qis.save_figs_to_pdf(figs=figs,
                          file_name=f"{portfolio_data.nav.name}_portfolio_factsheet",
                          orientation='landscape',
                          local_path=str(OUTPUT_PATH))
 
+
+
     qis.save_fig(fig=figs[0], file_name=f"{NAME}_factsheet_1", local_path=str(OUTPUT_PATH))
     if len(figs) > 1:
         qis.save_fig(fig=figs[1], file_name=f"{NAME}_portfolio_factsheet_2", local_path=str(OUTPUT_PATH))
+
+    # Automatically open the PDF
+    file_url = f"file://{os.path.abspath(pdf_path)}"
+    webbrowser.open(file_url)
 
 
 if __name__ == "__main__":

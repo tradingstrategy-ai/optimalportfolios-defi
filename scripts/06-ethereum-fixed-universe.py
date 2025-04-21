@@ -1,6 +1,6 @@
 """REbalancing DeFi tokens.
 
-- Change rebalancing freq to weekly, year length
+- Use fixed (longer history) backtesting universe
 
 """
 import os
@@ -19,10 +19,13 @@ from optimalportfolios import compute_rolling_optimal_weights, PortfolioObjectiv
 #: Where to store the results figures and such
 OUTPUT_PATH = Path("./output")
 
-DATASET_PATH = Path("~/exported/ethereum-1d.parquet")
+DATASET_PATH = Path("~/exported/ethereum-1d-legacy.parquet")
 
 #: Name of this backtest
 NAME = Path(__file__).stem
+
+
+ASSETS_INCLUDED = {"WBTC", "WETH", "AAVE", "MKR", "CRV", "LINK", "PAXG"}
 
 
 @dataclass
@@ -56,8 +59,6 @@ def filter_oldest_pair(df):
     result = df.merge(oldest_pairs, on=['base', 'quote'])
     result = result[result['pair_id'] == result['oldest_pair_id']]
 
-    import ipdb ; ipdb.set_trace()
-
     # Drop the temporary column
     result = result.drop('oldest_pair_id', axis=1)
 
@@ -80,7 +81,8 @@ def convert_to_asset_price_series(
         df = df.loc[df["base"].isin(asset_whitelist)]
 
     # Resolve USDC/USDT quote token competition
-    df = df[~(df["quote"] == "USDT")]
+    excluded_stablecoins = {"USDT", "DAI"}
+    df = df[~(df["quote"].isin(excluded_stablecoins))]
 
     oldest_pairs_df = filter_oldest_pair(df)
 
@@ -120,7 +122,7 @@ def main():
     df = pd.read_parquet(DATASET_PATH)
     portfolio_run_input = convert_to_asset_price_series(
         df,
-        asset_whitelist={"WBTC", "WETH", "AAVE"},
+        asset_whitelist=ASSETS_INCLUDED,
         benchmark_assets={"WBTC"},
     )
     prices, benchmark_prices, group_data = astuple(portfolio_run_input)
